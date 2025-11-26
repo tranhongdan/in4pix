@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tra Cứu Điểm Ảnh Học Sinh</title>
+    <!-- Tailwind CSS (để giao diện đẹp như bản React) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome (cho icon) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in-up { animation: fadeInUp 0.5s ease-out; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 md:p-8 flex items-center justify-center">
+
+    <div class="bg-white max-w-2xl w-full rounded-2xl shadow-xl overflow-hidden border border-blue-100">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 p-6 text-white text-center relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10" style="background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAADklEQVQIW2NgQAXGZHAAGioAza41NlAAAAAASUVORK5CYII=');"></div>
+            <h1 class="text-3xl font-bold mb-2 relative z-10">Tra Cứu Điểm Ảnh</h1>
+            <p class="text-blue-100 relative z-10">Dự án Pixel Học Sinh - Niên Khóa 2025</p>
+        </div>
+
+        <div class="p-6 md:p-8 space-y-6">
+            
+            <!-- Input Section -->
+            <div class="space-y-4">
+                <label class="block text-gray-700 font-semibold mb-2 flex items-center gap-2">
+                    <i class="fas fa-user text-blue-500"></i>
+                    Nhập số CCCD học sinh:
+                </label>
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <input
+                            type="text"
+                            id="input-cccd"
+                            placeholder="Ví dụ: 066210004661"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all pl-11"
+                        >
+                        <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+                    </div>
+                    <button
+                        onclick="xu_ly_tim_kiem()"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-200 transition-all active:scale-95 flex items-center gap-2"
+                    >
+                        Tra Cứu
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification Area -->
+            <div id="thong-bao" class="hidden p-4 rounded-xl flex items-center gap-3">
+                <i id="icon-thong-bao" class="fas"></i>
+                <span id="noi-dung-thong-bao"></span>
+            </div>
+
+            <!-- Result Section -->
+            <div id="ket-qua" class="hidden bg-slate-50 rounded-2xl p-6 border border-slate-200 shadow-sm fade-in-up">
+                <div class="flex flex-col md:flex-row gap-6">
+                    
+                    <!-- Basic Info -->
+                    <div class="flex-1 space-y-4">
+                        <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Thông Tin Học Sinh</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                <span class="text-gray-500 text-sm block">Họ và tên</span>
+                                <span id="hien-thi-ten" class="font-semibold text-lg text-blue-900"></span>
+                            </div>
+                            <div class="bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
+                                <span class="text-gray-500 text-sm block">Lớp</span>
+                                <span id="hien-thi-lop" class="font-semibold text-lg text-gray-800"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pixel Info -->
+                    <div class="flex-1 space-y-4">
+                        <h3 class="text-xl font-bold text-gray-800 border-b pb-2 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-red-500"></i>
+                            Thông Tin Tọa Độ
+                        </h3>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="bg-blue-50 p-4 rounded-xl text-center border border-blue-100">
+                                <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Tọa độ X</div>
+                                <div id="hien-thi-x" class="text-3xl font-black text-blue-600"></div>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-xl text-center border border-blue-100">
+                                <div class="text-blue-400 text-xs font-bold uppercase tracking-wider mb-1">Tọa độ Y</div>
+                                <div id="hien-thi-y" class="text-3xl font-black text-blue-600"></div>
+                            </div>
+                        </div>
+
+                        <!-- Color Display -->
+                        <div>
+                             <div class="text-gray-500 text-sm mb-1 flex items-center gap-1">
+                               <i class="fas fa-palette"></i> Mã màu điểm ảnh
+                             </div>
+                             <div 
+                                id="box-mau"
+                                class="w-full h-32 rounded-lg shadow-inner flex items-center justify-center flex-col border-2 border-gray-200 mt-2 transition-all duration-500 ease-in-out transform hover:scale-105"
+                             >
+                                <span class="font-bold text-lg">MÀU HIỂN THỊ</span>
+                                <span id="text-rgb" class="text-sm opacity-80"></span>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Import File Section -->
+            <div class="border-t pt-6 mt-6">
+                 <div class="flex items-center justify-between mb-4">
+                    <span class="text-sm text-gray-500 font-medium">Dữ liệu nguồn</span>
+                    <div class="flex items-center gap-2">
+                        <span id="so-luong-ban-ghi" class="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">
+                           0 bản ghi
+                        </span>
+                        <button 
+                          id="nut-khoi-phuc"
+                          onclick="xoa_du_lieu_luu_tru()"
+                          class="hidden text-xs flex items-center gap-1 bg-red-100 text-red-600 px-2 py-1 rounded hover:bg-red-200 transition-colors"
+                          title="Xóa dữ liệu đã tải lên và quay về mặc định"
+                        >
+                          <i class="fas fa-trash-alt"></i> Khôi phục gốc
+                        </button>
+                    </div>
+                 </div>
+                 
+                 <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors group relative overflow-hidden">
+                    <div class="flex flex-col items-center justify-center pt-5 pb-6 relative z-10">
+                        <div id="loading-spinner" class="hidden animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mb-2"></div>
+                        <div id="upload-content" class="text-center">
+                            <i class="fas fa-file-csv w-8 h-8 mb-2 text-gray-400 group-hover:text-blue-500 transition-colors text-2xl"></i>
+                            <p class="mb-1 text-sm text-gray-500"><span class="font-semibold">Nhấn để tải lên file CSV</span> (Tự động lưu)</p>
+                            <p class="text-xs text-gray-400 px-2">Dữ liệu sẽ được lưu vào trình duyệt này cho lần sau</p>
+                        </div>
+                    </div>
+                    <div id="badge-personal-data" class="hidden absolute top-0 right-0 bg-green-500 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">
+                         ĐANG DÙNG DỮ LIỆU CÁ NHÂN
+                    </div>
+                    <input type="file" class="hidden" accept=".csv" onchange="xu_ly_upload_file(event)" />
+                </label>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Logic Javascript -->
+    <script>
+        // Dữ liệu mẫu ban đầu
+        const du_lieu_mau = [
+          { cccd: "066210004661", ten: "NGUYỄN TẤN HOÀNG ANH", lop: "10A01", x: 30, y: 4, r: 249, g: 211, b: 33 },
+          { cccd: "066210012941", ten: "NGUYỄN TUẤN ANH", lop: "10A01", x: 29, y: 5, r: 248, g: 209, b: 33 },
+          { cccd: "066210008475", ten: "MAI THÁI BẢO", lop: "10A01", x: 30, y: 5, r: 249, g: 210, b: 34 },
+          { cccd: "066210010908", ten: "THÂN VĂN BẢO", lop: "10A01", x: 31, y: 5, r: 248, g: 209, b: 33 },
+          { cccd: "066310001904", ten: "HOÀNG NGỌC BẢO CHÂU", lop: "10A01", x: 29, y: 6, r: 248, g: 209, b: 33 },
+          { cccd: "087310008406", ten: "LÊ NGỌC DIỆP", lop: "10A01", x: 30, y: 6, r: 249, g: 210, b: 34 },
+          { cccd: "066310015102", ten: "HUỲNH ĐÀM BÌNH DƯƠNG", lop: "10A01", x: 31, y: 6, r: 249, g: 210, b: 34 },
+          { cccd: "066210004223", ten: "NGUYỄN MINH ĐỨC", lop: "10A01", x: 28, y: 7, r: 249, g: 211, b: 33 },
+          { cccd: "066208013764", ten: "Y DLU - ADRƠNG", lop: "12A09", x: 16, y: 48, r: 249, g: 210, b: 34 },
+          { cccd: "066308013335", ten: "LÒ THỊ KIM ĐIỆP", lop: "12A09", x: 17, y: 48, r: 249, g: 210, b: 34 },
+          { cccd: "066208012083", ten: "LƯƠNG QUANG HOÀNG ĐIỆP", lop: "12A09", x: 18, y: 48, r: 249, g: 208, b: 34 },
+          { cccd: "066308018357", ten: "NGUYỄN MỸ HẢO", lop: "12A09", x: 42, y: 48, r: 249, g: 209, b: 35 },
+          { cccd: "066208015524", ten: "NGUYỄN BẢO HUY", lop: "12A09", x: 43, y: 48, r: 248, g: 209, b: 33 },
+          { cccd: "066308002196", ten: "LƯU ĐẶNG MAI HƯƠNG", lop: "12A09", x: 44, y: 48, r: 248, g: 209, b: 33 },
+          { cccd: "066208015176", ten: "PHẠM HỒ AN KHANG", lop: "12A09", x: 45, y: 48, r: 249, g: 209, b: 33 },
+          { cccd: "066208006052", ten: "TRẦN THIỆN KHIÊM", lop: "12A09", x: 16, y: 49, r: 249, g: 210, b: 33 }
+        ];
+
+        const KHOA_LUU_TRU = 'du_lieu_hoc_sinh_pixel_html_v1';
+        let danh_sach_du_lieu = [];
+
+        // Khởi tạo ứng dụng
+        window.onload = function() {
+            tai_du_lieu();
+            cap_nhat_giao_dien_trang_thai();
+            
+            // Lắng nghe sự kiện Enter trong ô input
+            document.getElementById('input-cccd').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    xu_ly_tim_kiem();
+                }
+            });
+        };
+
+        function tai_du_lieu() {
+            try {
+                const du_lieu_da_luu = localStorage.getItem(KHOA_LUU_TRU);
+                if (du_lieu_da_luu) {
+                    danh_sach_du_lieu = JSON.parse(du_lieu_da_luu);
+                } else {
+                    danh_sach_du_lieu = du_lieu_mau;
+                }
+            } catch (error) {
+                console.error("Lỗi đọc dữ liệu:", error);
+                danh_sach_du_lieu = du_lieu_mau;
+            }
+        }
+
+        function cap_nhat_giao_dien_trang_thai() {
+            const saved = localStorage.getItem(KHOA_LUU_TRU);
+            const nutKhoiPhuc = document.getElementById('nut-khoi-phuc');
+            const badgePersonal = document.getElementById('badge-personal-data');
+            
+            document.getElementById('so-luong-ban-ghi').innerText = `${danh_sach_du_lieu.length} bản ghi`;
+
+            if (saved) {
+                nutKhoiPhuc.classList.remove('hidden');
+                badgePersonal.classList.remove('hidden');
+            } else {
+                nutKhoiPhuc.classList.add('hidden');
+                badgePersonal.classList.add('hidden');
+            }
+        }
+
+        function xu_ly_tim_kiem() {
+            const input = document.getElementById('input-cccd');
+            const tu_khoa = input.value.trim();
+            const ket_qua_div = document.getElementById('ket-qua');
+            
+            if (!tu_khoa) {
+                hien_thong_bao("Vui lòng nhập số CCCD.", "loi");
+                ket_qua_div.classList.add('hidden');
+                return;
+            }
+
+            const tim_thay = danh_sach_du_lieu.find(item => item.cccd.includes(tu_khoa));
+
+            if (tim_thay) {
+                hien_thong_bao(null); // Ẩn thông báo
+                hien_thi_ket_qua(tim_thay);
+            } else {
+                hien_thong_bao("Không tìm thấy dữ liệu cho số CCCD này.", "loi");
+                ket_qua_div.classList.add('hidden');
+            }
+        }
+
+        function hien_thi_ket_qua(data) {
+            const ket_qua_div = document.getElementById('ket-qua');
+            ket_qua_div.classList.remove('hidden');
+            
+            // Reset animation
+            ket_qua_div.classList.remove('fade-in-up');
+            void ket_qua_div.offsetWidth; // trigger reflow
+            ket_qua_div.classList.add('fade-in-up');
+
+            // Dien thong tin
+            document.getElementById('hien-thi-ten').innerText = data.ten;
+            document.getElementById('hien-thi-lop').innerText = data.lop;
+            document.getElementById('hien-thi-x').innerText = data.x;
+            document.getElementById('hien-thi-y').innerText = data.y;
+
+            // Xu ly mau sac
+            const boxMau = document.getElementById('box-mau');
+            const textRgb = document.getElementById('text-rgb');
+            const mauRgb = `rgb(${data.r}, ${data.g}, ${data.b})`;
+            
+            boxMau.style.backgroundColor = mauRgb;
+            textRgb.innerText = `RGB(${data.r}, ${data.g}, ${data.b})`;
+
+            // Tinh mau chu tuong phan
+            const do_sang = (data.r * 299 + data.g * 587 + data.b * 114) / 1000;
+            boxMau.style.color = do_sang > 125 ? 'black' : 'white';
+        }
+
+        function hien_thong_bao(noi_dung, loai) {
+            const div = document.getElementById('thong-bao');
+            const icon = document.getElementById('icon-thong-bao');
+            const text = document.getElementById('noi-dung-thong-bao');
+
+            if (!noi_dung) {
+                div.classList.add('hidden');
+                return;
+            }
+
+            div.classList.remove('hidden');
+            text.innerText = noi_dung;
+
+            // Reset classes
+            div.className = "p-4 rounded-xl flex items-center gap-3 mb-4";
+            icon.className = "";
+
+            if (loai === "thanh-cong") {
+                div.classList.add("bg-green-50", "text-green-700");
+                icon.classList.add("fas", "fa-check-circle");
+            } else {
+                div.classList.add("bg-red-50", "text-red-700");
+                icon.classList.add("fas", "fa-exclamation-circle");
+            }
+        }
+
+        function xu_ly_upload_file(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Hien thi loading
+            document.getElementById('loading-spinner').classList.remove('hidden');
+            document.getElementById('upload-content').classList.add('opacity-50');
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const text = e.target.result;
+                const lines = text.split('\n');
+                const du_lieu_moi = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line) {
+                        const parts = line.split(/,|;/); 
+                        if (parts.length >= 8) {
+                            du_lieu_moi.push({
+                                cccd: parts[0].replace(/['"]+/g, '').trim(),
+                                ten: parts[1].replace(/['"]+/g, '').trim(),
+                                lop: parts[2].replace(/['"]+/g, '').trim(),
+                                x: parseInt(parts[3]),
+                                y: parseInt(parts[4]),
+                                r: parseInt(parts[5]),
+                                g: parseInt(parts[6]),
+                                b: parseInt(parts[7])
+                            });
+                        }
+                    }
+                }
+
+                // Luu vao local storage
+                danh_sach_du_lieu = du_lieu_moi;
+                localStorage.setItem(KHOA_LUU_TRU, JSON.stringify(du_lieu_moi));
+
+                // Cap nhat UI
+                document.getElementById('loading-spinner').classList.add('hidden');
+                document.getElementById('upload-content').classList.remove('opacity-50');
+                
+                hien_thong_bao(`Đã tải lên và LƯU thành công ${du_lieu_moi.length} học sinh.`, "thanh-cong");
+                cap_nhat_giao_dien_trang_thai();
+                
+                // Reset input
+                event.target.value = null;
+                
+                // An ket qua cu
+                document.getElementById('ket-qua').classList.add('hidden');
+            };
+
+            reader.readAsText(file);
+        }
+
+        function xoa_du_lieu_luu_tru() {
+            if (confirm("Bạn có chắc muốn xóa dữ liệu đã tải lên và quay về dữ liệu mẫu ban đầu?")) {
+                localStorage.removeItem(KHOA_LUU_TRU);
+                danh_sach_du_lieu = du_lieu_mau;
+                cap_nhat_giao_dien_trang_thai();
+                hien_thong_bao("Đã khôi phục về dữ liệu mẫu ban đầu.", "thanh-cong");
+                document.getElementById('ket-qua').classList.add('hidden');
+                document.getElementById('input-cccd').value = "";
+            }
+        }
+    </script>
+</body>
+</html>
